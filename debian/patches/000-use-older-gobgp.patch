@@ -1,0 +1,96 @@
+From: Mathias Gibbens <mathias@calenhad.com>
+Description: Until gobgp v3 is packaged for Debian, switch back to the older library's API
+Forwarded: not-needed
+diff --git a/lxd/bgp/server.go b/lxd/bgp/server.go
+index 9b75499ca..1d07b48df 100644
+--- a/lxd/bgp/server.go
++++ b/lxd/bgp/server.go
+@@ -7,11 +7,12 @@ import (
+ 	"strconv"
+ 	"sync"
+ 
+-	bgpAPI "github.com/osrg/gobgp/v3/api"
+-	bgpPacket "github.com/osrg/gobgp/v3/pkg/packet/bgp"
+-	bgpServer "github.com/osrg/gobgp/v3/pkg/server"
++	"github.com/golang/protobuf/ptypes"
++	"github.com/golang/protobuf/ptypes/any"
++	bgpAPI "github.com/osrg/gobgp/api"
++	bgpPacket "github.com/osrg/gobgp/pkg/packet/bgp"
++	bgpServer "github.com/osrg/gobgp/pkg/server"
+ 	"github.com/pborman/uuid"
+-	"google.golang.org/protobuf/types/known/anypb"
+ 
+ 	"github.com/lxc/lxd/lxd/revert"
+ 	"github.com/lxc/lxd/shared/logger"
+@@ -114,7 +115,7 @@ func (s *Server) start(address string, asn uint32, routerID net.IP) error {
+ 	// Setup the listener configuration.
+ 	conf := &bgpAPI.Global{
+ 		RouterId: routerID.String(),
+-		Asn:      asn,
++		As:       asn,
+ 
+ 		// Always setup for IPv4 and IPv6.
+ 		Families: []uint32{0, 1},
+@@ -245,12 +246,12 @@ func (s *Server) addPrefix(subnet net.IPNet, nexthop net.IP, owner string) error
+ 	prefixLen, _ := subnet.Mask.Size()
+ 	prefix := subnet.IP.String()
+ 
+-	nlri, _ := anypb.New(&bgpAPI.IPAddressPrefix{
++	nlri, _ := ptypes.MarshalAny(&bgpAPI.IPAddressPrefix{
+ 		Prefix:    prefix,
+ 		PrefixLen: uint32(prefixLen),
+ 	})
+ 
+-	aOrigin, _ := anypb.New(&bgpAPI.OriginAttribute{
++	aOrigin, _ := ptypes.MarshalAny(&bgpAPI.OriginAttribute{
+ 		Origin: 0,
+ 	})
+ 
+@@ -259,7 +260,7 @@ func (s *Server) addPrefix(subnet net.IPNet, nexthop net.IP, owner string) error
+ 	if s.bgp != nil {
+ 		if subnet.IP.To4() != nil {
+ 			// IPv4 prefix.
+-			aNextHop, _ := anypb.New(&bgpAPI.NextHopAttribute{
++			aNextHop, _ := ptypes.MarshalAny(&bgpAPI.NextHopAttribute{
+ 				NextHop: nexthop.String(),
+ 			})
+ 
+@@ -267,7 +268,7 @@ func (s *Server) addPrefix(subnet net.IPNet, nexthop net.IP, owner string) error
+ 				Path: &bgpAPI.Path{
+ 					Family: &bgpAPI.Family{Afi: bgpAPI.Family_AFI_IP, Safi: bgpAPI.Family_SAFI_UNICAST},
+ 					Nlri:   nlri,
+-					Pattrs: []*anypb.Any{aOrigin, aNextHop},
++					Pattrs: []*any.Any{aOrigin, aNextHop},
+ 				},
+ 			})
+ 			if err != nil {
+@@ -282,17 +283,17 @@ func (s *Server) addPrefix(subnet net.IPNet, nexthop net.IP, owner string) error
+ 				Safi: bgpAPI.Family_SAFI_UNICAST,
+ 			}
+ 
+-			v6Attrs, _ := anypb.New(&bgpAPI.MpReachNLRIAttribute{
++			v6Attrs, _ := ptypes.MarshalAny(&bgpAPI.MpReachNLRIAttribute{
+ 				Family:   family,
+ 				NextHops: []string{nexthop.String()},
+-				Nlris:    []*anypb.Any{nlri},
++				Nlris:    []*any.Any{nlri},
+ 			})
+ 
+ 			resp, err := s.bgp.AddPath(context.Background(), &bgpAPI.AddPathRequest{
+ 				Path: &bgpAPI.Path{
+ 					Family: family,
+ 					Nlri:   nlri,
+-					Pattrs: []*anypb.Any{aOrigin, v6Attrs},
++					Pattrs: []*any.Any{aOrigin, v6Attrs},
+ 				},
+ 			})
+ 			if err != nil {
+@@ -420,7 +421,7 @@ func (s *Server) addPeer(address net.IP, asn uint32, password string) error {
+ 		// Peer information.
+ 		Conf: &bgpAPI.PeerConf{
+ 			NeighborAddress: address.String(),
+-			PeerAsn:         uint32(asn),
++			PeerAs:          uint32(asn),
+ 			AuthPassword:    password,
+ 		},
+ 

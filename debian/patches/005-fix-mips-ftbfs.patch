@@ -1,0 +1,31 @@
+From: Mathias Gibbens <mathias@calenhad.com>
+Description: Fix FTBFS on mips64el and mipsel architectures by explicitly casting uint32 values to uint64
+Forwarded: https://github.com/lxc/lxd/issues/10910
+diff --git a/lxd/instance/drivers/driver_lxc.go b/lxd/instance/drivers/driver_lxc.go
+index bf9743627..c7580417a 100644
+--- a/lxd/instance/drivers/driver_lxc.go
++++ b/lxd/instance/drivers/driver_lxc.go
+@@ -7053,7 +7053,7 @@ func (d *lxc) getFSStats() (*metrics.MetricSet, error) {
+ 					return nil, fmt.Errorf("Failed to stat %s: %w", dev["source"], err)
+ 				}
+ 
+-				backingFilePath := fmt.Sprintf("/sys/dev/block/%d:%d/loop/backing_file", unix.Major(stat.Dev), unix.Minor(stat.Dev))
++				backingFilePath := fmt.Sprintf("/sys/dev/block/%d:%d/loop/backing_file", unix.Major(uint64(stat.Dev)), unix.Minor(uint64(stat.Dev)))
+ 
+ 				if shared.PathExists(backingFilePath) {
+ 					// Read backing file
+diff --git a/shared/osarch/architectures.go b/shared/osarch/architectures.go
+index 8c3850eb7..c75cc5e95 100644
+--- a/shared/osarch/architectures.go
++++ b/shared/osarch/architectures.go
+@@ -43,8 +43,8 @@ var architectureAliases = map[int][]string{
+ 	ARCH_32BIT_POWERPC_BIG_ENDIAN:    {"powerpc"},
+ 	ARCH_64BIT_POWERPC_BIG_ENDIAN:    {"powerpc64", "ppc64"},
+ 	ARCH_64BIT_POWERPC_LITTLE_ENDIAN: {"ppc64el"},
+-	ARCH_32BIT_MIPS:                  {"mipsel"},
+-	ARCH_64BIT_MIPS:                  {"mips64el"},
++	ARCH_32BIT_MIPS:                  {"mipsel", "mipsle"},
++	ARCH_64BIT_MIPS:                  {"mips64el", "mips64le"},
+ 	ARCH_32BIT_RISCV_LITTLE_ENDIAN:   {},
+ 	ARCH_64BIT_RISCV_LITTLE_ENDIAN:   {},
+ }

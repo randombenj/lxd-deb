@@ -1,0 +1,11 @@
+# Ignore error about statically-linked lxd-agent binary; see README.source for details
+lxd-agent: statically-linked-binary
+
+# Flagged spelling errors come from other golang packages
+lxd-agent: spelling-error-in-binary
+
+# For now, lxd-agent only installs a systemd service file (patches of course are welcome!)
+lxd-agent: package-supports-alternative-init-but-no-init.d-script
+
+# Silence an experimental tag
+lxd-agent: systemd-service-file-missing-hardening-features

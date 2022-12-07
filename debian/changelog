@@ -1,0 +1,24 @@
+lxd (5.0.1-2) unstable; urgency=medium
+
+  * Ignore lintian error about statically-linked lxd-agent binary
+  * Enable hardening build flags in d/rules
+  * Add patch to fix FTBFS on mips64el and mipsel
+  * Add patch to fix FTBFS on armel and armhf
+
+ -- Mathias Gibbens <mathias@calenhad.com>  Wed, 14 Sep 2022 02:15:22 +0000
+
+lxd (5.0.1-1) unstable; urgency=medium
+
+  * New upstream release
+    - Add/delete/refresh patches as needed
+    - Cherry-pick upstream commits to fix xattr test
+  * Update Build-Depends in d/control
+  * Exclude devlxd-client from building in d/rules
+
+ -- Mathias Gibbens <mathias@calenhad.com>  Sun, 11 Sep 2022 19:30:25 +0000
+
+lxd (5.0.0-1) unstable; urgency=medium
+
+  * Initial release (Closes: #768073)
+
+ -- Mathias Gibbens <mathias@calenhad.com>  Thu, 04 Aug 2022 17:09:19 +0530

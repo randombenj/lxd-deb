@@ -1,0 +1,41 @@
+Init scripts
+============
+
+Both systemd and SysV init scripts are included, but the SysV scripts aren't as
+well-tested as the systemd ones. Bug reports and patches are welcome to improve
+the LXD experience on non-systemd installs.
+
+When installing LXD in a non-systemd environment, it is highly recommended that
+you install the cgroupfs-mount package, otherwise several LXD capabilities to
+provide fine-grained resource limits and priorities will be unavailable.
+
+Storage backends
+================
+
+LXD supports several storage backends. When installing, LXD will suggest the
+necessary packages to enable all storage backends, but in brief:
+
+  * btrfs requires the btrfs-progs package
+  * ceph/cephfs require the ceph-common package
+  * lvm requires the lvm2 package
+  * zfs requires the zfsutils-linux package
+
+After installing one or more of those additional packages, be sure to restart
+the LXD service so it picks up the additional storage backend(s).
+
+Virtual machines
+================
+
+LXD optionally can create virtual machine instances utilizing QEMU. To enable
+this capability, on the host system install the desired qemu-system-<arch>
+package(s) and the lxd-agent package. Then, restart the LXD service. You will
+now be able to create virtual machine instances by passing the `--vm` flag in
+your creation command.
+
+Known issues
+============
+
+  * If the apparmor package is not installed on the host system, containers
+will fail to start unless their configuration is modified to include
+"lxc.apparmor.profile=unconfined"; this has been reported upstream at
+https://github.com/lxc/lxc/issues/4150.

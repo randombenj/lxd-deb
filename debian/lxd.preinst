@@ -1,0 +1,64 @@
+#!/bin/sh
+set -e
+
+add_groups()
+{
+    if ! getent group lxd >/dev/null; then
+        addgroup --system lxd
+    fi
+
+    # Policy section 9.2 requires that special usernames begin with an underscore
+    if ! getent passwd _lxd >/dev/null; then
+        adduser --force-badname --system --home /var/lib/lxd/ --shell /bin/false --ingroup lxd _lxd
+
+        # UID allocation
+        NEXT_UID=100000
+        while read line; do
+            OLD_IFS=$IFS
+            IFS=":"
+            set -- $line
+            IFS=$OLD_IFS
+
+            [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] && continue
+
+            LAST=$(($2+$3))
+            [ "$LAST" -gt "$NEXT_UID" ] && NEXT_UID=$LAST
+        done < /etc/subuid
+        usermod --add-subuids ${NEXT_UID}-$(($NEXT_UID+10000000)) _lxd
+        usermod --add-subuids ${NEXT_UID}-$(($NEXT_UID+10000000)) root
+
+        # GID allocation
+        NEXT_GID=100000
+        while read line; do
+            OLD_IFS=$IFS
+            IFS=":"
+            set -- $line
+            IFS=$OLD_IFS
+
+            [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] && continue
+
+            LAST=$(($2+$3))
+            [ "$LAST" -gt "$NEXT_GID" ] && NEXT_GID=$LAST
+        done < /etc/subgid
+        usermod --add-subgids ${NEXT_GID}-$(($NEXT_GID+10000000)) _lxd
+        usermod --add-subgids ${NEXT_GID}-$(($NEXT_GID+10000000)) root
+    fi
+}
+
+case "$1" in
+    install|upgrade)
+        add_groups
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "preinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+#DEBHELPER#
+
+exit 0

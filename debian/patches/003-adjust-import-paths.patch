@@ -1,0 +1,301 @@
+From: Mathias Gibbens <mathias@calenhad.com>
+Description: Adjust import paths to reflect Debian packaging
+Forwarded: not-needed
+diff --git a/client/connection.go b/client/connection.go
+index fa86cf582..3a1519a4b 100644
+--- a/client/connection.go
++++ b/client/connection.go
+@@ -12,7 +12,7 @@ import (
+ 	"time"
+ 
+ 	"github.com/gorilla/websocket"
+-	"gopkg.in/macaroon-bakery.v3/httpbakery"
++	"github.com/go-macaroon-bakery/macaroon-bakery/httpbakery"
+ 
+ 	"github.com/lxc/lxd/shared"
+ 	"github.com/lxc/lxd/shared/logger"
+diff --git a/client/lxd.go b/client/lxd.go
+index 48779580b..48fa9368f 100644
+--- a/client/lxd.go
++++ b/client/lxd.go
+@@ -13,8 +13,8 @@ import (
+ 	"time"
+ 
+ 	"github.com/gorilla/websocket"
+-	"gopkg.in/macaroon-bakery.v3/bakery"
+-	"gopkg.in/macaroon-bakery.v3/httpbakery"
++	"github.com/go-macaroon-bakery/macaroon-bakery/bakery"
++	"github.com/go-macaroon-bakery/macaroon-bakery/httpbakery"
+ 
+ 	"github.com/lxc/lxd/shared"
+ 	"github.com/lxc/lxd/shared/api"
+diff --git a/lxc-to-lxd/main_migrate.go b/lxc-to-lxd/main_migrate.go
+index d3a884865..17a738bac 100644
+--- a/lxc-to-lxd/main_migrate.go
++++ b/lxc-to-lxd/main_migrate.go
+@@ -8,7 +8,7 @@ import (
+ 	"strconv"
+ 	"strings"
+ 
+-	liblxc "github.com/lxc/go-lxc"
++	liblxc "gopkg.in/lxc/go-lxc.v2"
+ 	"github.com/spf13/cobra"
+ 
+ 	"github.com/lxc/lxd/client"
+diff --git a/lxc-to-lxd/main_migrate_test.go b/lxc-to-lxd/main_migrate_test.go
+index 4c0dab1fc..907dd2422 100644
+--- a/lxc-to-lxd/main_migrate_test.go
++++ b/lxc-to-lxd/main_migrate_test.go
+@@ -7,7 +7,7 @@ import (
+ 	"strings"
+ 	"testing"
+ 
+-	liblxc "github.com/lxc/go-lxc"
++	liblxc "gopkg.in/lxc/go-lxc.v2"
+ 	"github.com/stretchr/testify/require"
+ )
+ 
+diff --git a/lxc-to-lxd/network.go b/lxc-to-lxd/network.go
+index 1d0752de5..320ea1852 100644
+--- a/lxc-to-lxd/network.go
++++ b/lxc-to-lxd/network.go
+@@ -4,7 +4,7 @@ import (
+ 	"fmt"
+ 	"strings"
+ 
+-	liblxc "github.com/lxc/go-lxc"
++	liblxc "gopkg.in/lxc/go-lxc.v2"
+ )
+ 
+ func networkGet(container *liblxc.Container, index int, configKey string) map[string]string {
+diff --git a/lxc/config/remote.go b/lxc/config/remote.go
+index 2bde13135..968abc419 100644
+--- a/lxc/config/remote.go
++++ b/lxc/config/remote.go
+@@ -12,8 +12,8 @@ import (
+ 
+ 	"github.com/juju/persistent-cookiejar"
+ 	schemaform "gopkg.in/juju/environschema.v1/form"
+-	"gopkg.in/macaroon-bakery.v3/httpbakery"
+-	"gopkg.in/macaroon-bakery.v3/httpbakery/form"
++	"github.com/go-macaroon-bakery/macaroon-bakery/httpbakery"
++	"github.com/go-macaroon-bakery/macaroon-bakery/httpbakery/form"
+ 
+ 	"github.com/lxc/lxd/client"
+ 	"github.com/lxc/lxd/shared"
+diff --git a/lxd-migrate/utils.go b/lxd-migrate/utils.go
+index c33113ffc..38b437ca5 100644
+--- a/lxd-migrate/utils.go
++++ b/lxd-migrate/utils.go
+@@ -17,8 +17,8 @@ import (
+ 	"golang.org/x/sys/unix"
+ 	"golang.org/x/term"
+ 	schemaform "gopkg.in/juju/environschema.v1/form"
+-	"gopkg.in/macaroon-bakery.v3/httpbakery"
+-	"gopkg.in/macaroon-bakery.v3/httpbakery/form"
++	"github.com/go-macaroon-bakery/macaroon-bakery/httpbakery"
++	"github.com/go-macaroon-bakery/macaroon-bakery/httpbakery/form"
+ 
+ 	"github.com/lxc/lxd/client"
+ 	"github.com/lxc/lxd/lxd/migration"
+diff --git a/lxd/daemon.go b/lxd/daemon.go
+index b4cb0b1fe..fbc03f126 100644
+--- a/lxd/daemon.go
++++ b/lxd/daemon.go
+@@ -21,12 +21,12 @@ import (
+ 	dqliteClient "github.com/canonical/go-dqlite/client"
+ 	"github.com/canonical/go-dqlite/driver"
+ 	"github.com/gorilla/mux"
+-	liblxc "github.com/lxc/go-lxc"
++	liblxc "gopkg.in/lxc/go-lxc.v2"
+ 	"golang.org/x/sys/unix"
+-	"gopkg.in/macaroon-bakery.v3/bakery"
+-	"gopkg.in/macaroon-bakery.v3/bakery/checkers"
+-	"gopkg.in/macaroon-bakery.v3/bakery/identchecker"
+-	"gopkg.in/macaroon-bakery.v3/httpbakery"
++	"github.com/go-macaroon-bakery/macaroon-bakery/bakery"
++	"github.com/go-macaroon-bakery/macaroon-bakery/bakery/checkers"
++	"github.com/go-macaroon-bakery/macaroon-bakery/bakery/identchecker"
++	"github.com/go-macaroon-bakery/macaroon-bakery/httpbakery"
+ 
+ 	"github.com/lxc/lxd/lxd/bgp"
+ 	"github.com/lxc/lxd/lxd/cluster"
+diff --git a/lxd/device/proxy.go b/lxd/device/proxy.go
+index 57d0c99c5..a1afbe6bb 100644
+--- a/lxd/device/proxy.go
++++ b/lxd/device/proxy.go
+@@ -11,7 +11,7 @@ import (
+ 	"strings"
+ 	"time"
+ 
+-	liblxc "github.com/lxc/go-lxc"
++	liblxc "gopkg.in/lxc/go-lxc.v2"
+ 
+ 	"github.com/lxc/lxd/lxd/apparmor"
+ 	"github.com/lxc/lxd/lxd/db"
+diff --git a/lxd/instance/drivers/driver_lxc.go b/lxd/instance/drivers/driver_lxc.go
+index bf9743627..2b6a2748c 100644
+--- a/lxd/instance/drivers/driver_lxc.go
++++ b/lxd/instance/drivers/driver_lxc.go
+@@ -25,7 +25,7 @@ import (
+ 	"time"
+ 
+ 	"github.com/flosch/pongo2"
+-	liblxc "github.com/lxc/go-lxc"
++	liblxc "gopkg.in/lxc/go-lxc.v2"
+ 	"github.com/pborman/uuid"
+ 	"github.com/pkg/sftp"
+ 	"golang.org/x/sys/unix"
+diff --git a/lxd/instance/instance_interface.go b/lxd/instance/instance_interface.go
+index 566c74ba0..1e6cc9967 100644
+--- a/lxd/instance/instance_interface.go
++++ b/lxd/instance/instance_interface.go
+@@ -7,7 +7,7 @@ import (
+ 	"os"
+ 	"time"
+ 
+-	liblxc "github.com/lxc/go-lxc"
++	liblxc "gopkg.in/lxc/go-lxc.v2"
+ 	"github.com/pkg/sftp"
+ 
+ 	"github.com/lxc/lxd/lxd/backup"
+diff --git a/lxd/instance/instance_utils.go b/lxd/instance/instance_utils.go
+index 773e28440..cf1b857cc 100644
+--- a/lxd/instance/instance_utils.go
++++ b/lxd/instance/instance_utils.go
+@@ -14,7 +14,7 @@ import (
+ 	"time"
+ 
+ 	"github.com/flosch/pongo2"
+-	liblxc "github.com/lxc/go-lxc"
++	liblxc "gopkg.in/lxc/go-lxc.v2"
+ 	"github.com/pborman/uuid"
+ 
+ 	"github.com/lxc/lxd/client"
+diff --git a/lxd/instance_console.go b/lxd/instance_console.go
+index 745083b88..8d97b3f2d 100644
+--- a/lxd/instance_console.go
++++ b/lxd/instance_console.go
+@@ -14,7 +14,7 @@ import (
+ 
+ 	"github.com/gorilla/mux"
+ 	"github.com/gorilla/websocket"
+-	liblxc "github.com/lxc/go-lxc"
++	liblxc "gopkg.in/lxc/go-lxc.v2"
+ 	"golang.org/x/sys/unix"
+ 
+ 	"github.com/lxc/lxd/lxd/cluster"
+diff --git a/lxd/main_forkconsole.go b/lxd/main_forkconsole.go
+index 03895009a..a3a460d3b 100644
+--- a/lxd/main_forkconsole.go
++++ b/lxd/main_forkconsole.go
+@@ -6,7 +6,7 @@ import (
+ 	"strconv"
+ 	"strings"
+ 
+-	liblxc "github.com/lxc/go-lxc"
++	liblxc "gopkg.in/lxc/go-lxc.v2"
+ 	"github.com/spf13/cobra"
+ )
+ 
+diff --git a/lxd/main_forkmigrate.go b/lxd/main_forkmigrate.go
+index 9d93dd2e0..583290825 100644
+--- a/lxd/main_forkmigrate.go
++++ b/lxd/main_forkmigrate.go
+@@ -5,7 +5,7 @@ import (
+ 	"os"
+ 	"strconv"
+ 
+-	liblxc "github.com/lxc/go-lxc"
++	liblxc "gopkg.in/lxc/go-lxc.v2"
+ 	"github.com/spf13/cobra"
+ )
+ 
+diff --git a/lxd/main_forkstart.go b/lxd/main_forkstart.go
+index 34fdd11ba..142a2458d 100644
+--- a/lxd/main_forkstart.go
++++ b/lxd/main_forkstart.go
+@@ -4,7 +4,7 @@ import (
+ 	"fmt"
+ 	"os"
+ 
+-	liblxc "github.com/lxc/go-lxc"
++	liblxc "gopkg.in/lxc/go-lxc.v2"
+ 	"github.com/spf13/cobra"
+ 	"golang.org/x/sys/unix"
+ 
+diff --git a/lxd/migrate_instance.go b/lxd/migrate_instance.go
+index 26828e20f..e9070b37a 100644
+--- a/lxd/migrate_instance.go
++++ b/lxd/migrate_instance.go
+@@ -12,7 +12,7 @@ import (
+ 	"time"
+ 
+ 	"github.com/gorilla/websocket"
+-	liblxc "github.com/lxc/go-lxc"
++	liblxc "gopkg.in/lxc/go-lxc.v2"
+ 	"google.golang.org/protobuf/proto"
+ 
+ 	"github.com/lxc/lxd/lxd/db/operationtype"
+diff --git a/lxd/rbac/server.go b/lxd/rbac/server.go
+index a8a401b70..3d77c8156 100644
+--- a/lxd/rbac/server.go
++++ b/lxd/rbac/server.go
+@@ -15,9 +15,9 @@ import (
+ 	"sync"
+ 	"time"
+ 
+-	"gopkg.in/macaroon-bakery.v3/bakery"
+-	"gopkg.in/macaroon-bakery.v3/httpbakery"
+-	"gopkg.in/macaroon-bakery.v3/httpbakery/agent"
++	"github.com/go-macaroon-bakery/macaroon-bakery/bakery"
++	"github.com/go-macaroon-bakery/macaroon-bakery/httpbakery"
++	"github.com/go-macaroon-bakery/macaroon-bakery/httpbakery/agent"
+ 
+ 	"github.com/lxc/lxd/shared"
+ 	"github.com/lxc/lxd/shared/logger"
+diff --git a/lxd/seccomp/seccomp.go b/lxd/seccomp/seccomp.go
+index 055f10e10..4f2fae44f 100644
+--- a/lxd/seccomp/seccomp.go
++++ b/lxd/seccomp/seccomp.go
+@@ -16,7 +16,7 @@ import (
+ 	"strings"
+ 	"unsafe"
+ 
+-	liblxc "github.com/lxc/go-lxc"
++	liblxc "gopkg.in/lxc/go-lxc.v2"
+ 	"golang.org/x/sys/unix"
+ 
+ 	deviceConfig "github.com/lxc/lxd/lxd/device/config"
+diff --git a/test/macaroon-identity/auth.go b/test/macaroon-identity/auth.go
+index 363fb5666..7e479988c 100644
+--- a/test/macaroon-identity/auth.go
++++ b/test/macaroon-identity/auth.go
+@@ -10,10 +10,10 @@ import (
+ 	"net/http"
+ 
+ 	"github.com/pborman/uuid"
+-	"gopkg.in/macaroon-bakery.v3/bakery"
+-	"gopkg.in/macaroon-bakery.v3/bakery/checkers"
+-	"gopkg.in/macaroon-bakery.v3/httpbakery"
+-	"gopkg.in/macaroon-bakery.v3/httpbakery/form"
++	"github.com/go-macaroon-bakery/macaroon-bakery/bakery"
++	"github.com/go-macaroon-bakery/macaroon-bakery/bakery/checkers"
++	"github.com/go-macaroon-bakery/macaroon-bakery/httpbakery"
++	"github.com/go-macaroon-bakery/macaroon-bakery/httpbakery/form"
+ )
+ 
+ const formURL string = "/form"
+diff --git a/test/macaroon-identity/formschema.go b/test/macaroon-identity/formschema.go
+index fa6a333cf..725663657 100644
+--- a/test/macaroon-identity/formschema.go
++++ b/test/macaroon-identity/formschema.go
+@@ -2,7 +2,7 @@ package main
+ 
+ import (
+ 	"gopkg.in/juju/environschema.v1"
+-	"gopkg.in/macaroon-bakery.v3/httpbakery/form"
++	"github.com/go-macaroon-bakery/macaroon-bakery/httpbakery/form"
+ )
+ 
+ var schemaResponse = form.SchemaResponse{

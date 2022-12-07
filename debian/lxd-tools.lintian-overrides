@@ -1,0 +1,2 @@
+# Flagged spelling errors come from other golang packages
+lxd-tools: spelling-error-in-binary

@@ -1,0 +1,45 @@
+#!/bin/sh
+set -e
+
+# Configure dnsmasq
+if [ -z "${2}" ]; then
+    if [ -f /etc/dnsmasq.d-available/lxd ] && [ ! -e /etc/dnsmasq.d/lxd ]; then
+        echo "Setting up lxd dnsmasq configuration."
+        mkdir -p /etc/dnsmasq.d
+        ln -s /etc/dnsmasq.d-available/lxd /etc/dnsmasq.d/lxd
+
+        # Try to restart a potential system wide dnsmasq
+        invoke-rc.d dnsmasq restart 2>/dev/null || true
+    fi
+fi
+
+#DEBHELPER#
+
+# Handle services start / restart manually, dh_installsystemd won't allow
+# restarting lxd.service on upgrades but not lxd-containers.service
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] || [ "$1" = "abort-deconfigure" ] || [ "$1" = "abort-remove" ] ; then
+    if [ -d /run/systemd/system ]; then
+        systemctl --system daemon-reload >/dev/null || true
+        if [ -n "$2" ]; then
+            _dh_action=restart
+        else
+            _dh_action=start
+        fi
+        deb-systemd-invoke $_dh_action 'lxd.service' 'lxd.socket' >/dev/null || true
+
+        # Only start 'lxd-containers', don't restart it on upgrades
+        deb-systemd-invoke start 'lxd-containers.service' >/dev/null || true
+    fi
+fi
+
+# Print the install message
+if [ -z "${2}" ]; then
+    echo ""
+    echo "LXD has been installed. You must run \`sudo lxd init\` to"
+    echo "perform the initial configuration of LXD."
+    echo "Be sure to add user(s) to the lxd group, then have them "
+    echo "logout and back in to properly setup their access."
+    echo ""
+fi
+
+exit 0

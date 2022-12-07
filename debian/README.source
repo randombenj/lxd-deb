@@ -1,0 +1,7 @@
+The lxd-agent binary is compiled as a statically-linked executable. This is done
+because if it is available on the host system, LXD will automatically copy the
+lxc-agent binary into new virtual machines that are created. Statically-linking
+it will allow execution within any arbitrary Linux vm that a user may create.
+
+I encountered this in my initial packaging of LXD for Debian, and the Gentoo
+folks have also run into this: https://bugs.gentoo.org/show_bug.cgi?id=752480

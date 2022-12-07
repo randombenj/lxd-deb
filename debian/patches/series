@@ -1,0 +1,6 @@
+000-use-older-gobgp.patch
+001-skip-TestConvertNetworkConfig.patch
+003-adjust-import-paths.patch
+004-cherry-pick-xattr-fix.patch
+005-fix-mips-ftbfs.patch
+006-fix-arm-ftbfs.patch
