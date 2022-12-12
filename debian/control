@@ -4,59 +4,6 @@ Uploaders: Mathias Gibbens <mathias@calenhad.com>
 Section: admin
 Testsuite: autopkgtest-pkg-go
 Priority: optional
-Build-Depends: debhelper-compat (= 13),
-               dh-golang,
-               golang-any,
-               golang-github-armon-go-proxyproto-dev,
-               golang-github-canonical-candid-dev (>= 1.12.1),
-               golang-github-canonical-go-dqlite-dev,
-               golang-github-digitalocean-go-qemu-dev,
-               golang-github-digitalocean-go-smbios-dev,
-               golang-github-dustinkirkland-golang-petname-dev,
-               golang-github-flosch-pongo2.v4-dev,
-               golang-github-fsnotify-fsnotify-dev,
-               golang-github-fvbommel-sortorder-dev,
-               golang-github-go-macaroon-bakery-macaroon-bakery-dev,
-               golang-github-google-gopacket-dev,
-               golang-github-gorilla-mux-dev,
-               golang-github-gorilla-websocket-dev,
-               golang-github-gosexy-gettext-dev,
-               golang-github-j-keck-arping-dev,
-               golang-github-jaypipes-pcidb-dev,
-               golang-github-jochenvg-go-udev-dev,
-               golang-github-juju-gomaasapi-dev,
-               golang-github-juju-persistent-cookiejar-dev,
-               golang-github-kballard-go-shellquote-dev,
-               golang-github-mattn-go-colorable-dev,
-               golang-github-mattn-go-sqlite3-dev,
-               golang-github-mdlayher-ndp-dev,
-               golang-github-mdlayher-netx-dev,
-               golang-github-mdlayher-vsock-dev,
-               golang-github-miekg-dns-dev,
-               golang-github-olekukonko-tablewriter-dev,
-               golang-github-osrg-gobgp-dev,
-               golang-github-pborman-uuid-dev,
-               golang-github-pkg-sftp-dev,
-               golang-github-pkg-xattr-dev,
-               golang-github-rican7-retry-dev,
-               golang-github-robfig-cron-dev,
-               golang-github-sirupsen-logrus-dev,
-               golang-github-spf13-cobra-dev,
-               golang-github-stretchr-testify-dev,
-               golang-gocapability-dev,
-               golang-golang-x-crypto-dev,
-               golang-golang-x-sys-dev,
-               golang-golang-x-term-dev,
-               golang-golang-x-text-dev,
-               golang-google-protobuf-dev,
-               golang-gopkg-juju-environschema.v1-dev,
-               golang-gopkg-lxc-go-lxc.v2-dev,
-               golang-gopkg-tomb.v2-dev,
-               golang-goprotobuf-dev,
-               golang-yaml.v2-dev,
-               help2man,
-               libacl1-dev,
-               libcap-dev
 Standards-Version: 4.6.1
 Vcs-Browser: https://salsa.debian.org/go-team/packages/lxd
 Vcs-Git: https://salsa.debian.org/go-team/packages/lxd.git
@@ -74,10 +21,11 @@ Depends: ${misc:Depends},
          dnsmasq,
          liblxc-common,
          lxcfs,
-         lxd-client (= ${binary:Version}),
          rsync,
          squashfs-tools,
          uidmap,
+         libuv1,
+         iptables,
          xz-utils
 Recommends: apparmor
 # First line of suggested packages will enable additional LXD storage backends
@@ -94,60 +42,3 @@ Description: Powerful system container and virtual machine manager - daemon
  simple, REST API.
  .
  This package contains the LXD daemon.
-
-Package: lxd-client
-# The lxc binary doesn't depend on liblxc1, so it can be built for any architecture
-Architecture: any
-# lxc prior to 5.0.0 shipped a file that conflicts with LXD (see #1010843)
-Breaks: lxc (<< 1:5.0.0)
-Depends: ${misc:Depends},
-         ${shlibs:Depends}
-Built-Using: ${misc:Built-Using}
-Description: Powerful system container and virtual machine manager - client
- LXD is a next generation system container and virtual machine manager.
- It offers a unified user experience around full Linux systems running
- inside containers or virtual machines.
- .
- A REST API is offered by LXD to remotely manage containers over the network,
- using an image based work-flow and with support for live migration.
- .
- This package contains the LXD command line client.
-
-Package: lxd-tools
-Architecture: linux-any
-Depends: ${misc:Depends},
-         ${shlibs:Depends}
-Built-Using: ${misc:Built-Using}
-Description: Powerful system container and virtual machine manager - extra tools
- LXD is a next generation system container and virtual machine manager.
- It offers a unified user experience around full Linux systems running
- inside containers or virtual machines.
- .
- This package contains extra tools provided with LXD.
-  - fuidshift - A tool to map/unmap filesystem uids/gids
-  - lxc-to-lxd - A tool to migrate LXC containers to LXD
-  - lxd-benchmark - A benchmarking tool for LXD
-
-Package: lxd-migrate
-Architecture: linux-any
-Depends: ${misc:Depends},
-         ${shlibs:Depends},
-         rsync
-Built-Using: ${misc:Built-Using}
-Description: LXD physical to instance migration tool
- This tool lets you turn any Linux filesystem (including your current one)
- into a LXD instance on a remote LXD host.
- .
- It will setup a clean mount tree made of the root filesystem and any
- additional mount you list, then transfer this through LXD's migration
- API to create a new instance from it.
-
-Package: lxd-agent
-Architecture: linux-any
-Depends: ${misc:Depends}
-Built-Using: ${misc:Built-Using}
-Description: LXD guest agent
- This package provides an agent to run inside LXD virtual machine guests.
- .
- It has to be installed on the LXD host if you want to allow agent
- injection capability when creating a virtual machine.

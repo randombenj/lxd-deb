@@ -1,2 +1,0 @@
-usr/bin/lxd-agent
-debian/wrappers/lxd-agent-setup lib/systemd/

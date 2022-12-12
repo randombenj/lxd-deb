@@ -10,8 +10,9 @@
 # Default-Stop:         0 1 6
 ### END INIT INFO
 
-# NOTE -- this sysvinit script isn't as well tested as its systemd counterpart,
-#         but was verified to work on a bookworm/sid system in December 2021.
+# NOTE -- This sysvinit script isn't as well tested as its systemd counterpart,
+#         but was verified to work on a bookworm/sid system in September 2022.
+#         The host system must have a cgroup v2 hierarchy mounted.
 
 DAEMON=/usr/bin/lxd
 NAME=lxd

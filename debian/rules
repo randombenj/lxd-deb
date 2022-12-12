@@ -1,53 +1,9 @@
 #!/usr/bin/make -f
 
-include /usr/share/dpkg/pkg-info.mk
-
-export DEB_BUILD_MAINT_OPTIONS = hardening=+all
-
-# Don't build binaries we don't ship
-# NOTE -- lxd-agent is listed here, as it is compiled as a statically-linked binary below
-export DH_GOLANG_EXCLUDES := deps devlxd-client generate macaroon-identity lxd-agent
-
-# Include various test-support files
-export DH_GOLANG_INSTALL_EXTRA := test/ shared/subprocess/testscript/
+export DEB_BUILD_OPTIONS=nostrip
 
 %:
-	dh $@ --builddirectory=_build --buildsystem=golang --with=golang
+	dh $@
 
-override_dh_auto_build:
-	# Build almost everything with dynamic linking
-	CGO_LDFLAGS_ALLOW="-Wl,-z,now" dh_auto_build
-
-	# Build lxd-agent as a statically-linked binary
-	CGO_LDFLAGS_ALLOW="-Wl,-z,now" CGO_ENABLED=0 DH_GOLANG_BUILDPKG="github.com/lxc/lxd/lxd-agent" DH_GOLANG_EXCLUDES="" dh_auto_build
-
-	# Generate the man pages
-	mkdir man1/
-	_build/bin/lxc manpage man1/
-	_build/bin/lxd manpage man1/
-	help2man _build/bin/fuidshift -n "uid/gid shifter" --no-info --no-discard-stderr --version-string=$(DEB_VERSION_UPSTREAM) > man1/fuidshift.1
-	help2man _build/bin/lxc-to-lxd -n "Convert LXC containers to LXD" --no-info --no-discard-stderr --version-string=$(DEB_VERSION_UPSTREAM) > man1/lxc-to-lxd.1
-	help2man _build/bin/lxd-agent -n "LXD virtual machine guest agent" --no-info --no-discard-stderr --version-string=$(DEB_VERSION_UPSTREAM) > man1/lxd-agent.1
-	help2man _build/bin/lxd-benchmark -n "LXD benchmark" --no-info --no-discard-stderr --version-string=$(DEB_VERSION_UPSTREAM) > man1/lxd-benchmark.1
-	help2man _build/bin/lxd-migrate -n "LXD physical to instance migration tool" --no-info --no-discard-stderr --version-string=$(DEB_VERSION_UPSTREAM) > man1/lxd-migrate.1
-	help2man _build/bin/lxd-user -n "LXD user project daemon" --no-info --no-discard-stderr --version-string=$(DEB_VERSION_UPSTREAM) > man1/lxd-user.1
-
-override_dh_auto_test:
-	CGO_LDFLAGS_ALLOW="-Wl,-z,now" dh_auto_test
-
-override_dh_auto_install:
-	dh_auto_install -- --no-source
-
-	# Need to rename various config files here, as dh_install cannot rename files
-	install -Dpm 0644 debian/lxd.dnsmasq debian/tmp/etc/dnsmasq.d-available/lxd
-	install -Dpm 0644 debian/lxd.logrotate debian/tmp/etc/logrotate.d/lxd
-	install -Dpm 0644 debian/lxd.sysctl debian/tmp/etc/sysctl.d/10-lxd-inotify.conf
-	install -Dpm 0644 scripts/bash/lxd-client debian/tmp/usr/share/bash-completion/completions/lxc
-
-override_dh_installinit:
-	dh_installinit
-	dh_installinit --name lxd-containers --no-stop-on-upgrade --no-restart-after-upgrade
-
-override_dh_installsystemd:
-	# Handle start / restart manually in lxd.postinst
-	dh_installsystemd --no-stop-on-upgrade --no-restart-after-upgrade --no-start
+# linker check fails ...
+override_dh_shlibdeps:

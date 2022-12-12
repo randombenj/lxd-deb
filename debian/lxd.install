@@ -1,8 +1,3 @@
-etc/dnsmasq.d-available/lxd
-etc/logrotate.d/lxd
-etc/sysctl.d/10-lxd-inotify.conf
-usr/bin/lxd
-usr/bin/lxd-user
-debian/wrappers/shutdown usr/libexec/lxd/
-debian/lxd-apparmor-load usr/libexec/lxd/
-debian/lxd-containers.service lib/systemd/system/
+pkgdata/lxd/etc/* etc/
+pkgdata/lxd/lib/* lib/
+pkgdata/lxd/usr/* usr/

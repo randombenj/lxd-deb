@@ -1,0 +1,13 @@
+lxd-*/
+pkgdata/lxd/usr/lib/*
+pkgdata/lxd/usr/bin/*
+
+/debian/files
+/debian/*.substvars
+/debian/*.after
+/debian/*.before
+/debian/*.log
+/debian/*.debhelper
+/debian/*-stamp
+/debian/*/
+
