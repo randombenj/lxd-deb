@@ -1,0 +1,121 @@
+name: debianize lxd
+
+on: [push, pull_request]
+
+jobs:
+  debianize-lxd:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-20.04, ubuntu-18.04]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: setup env
+        run: |
+          echo GO_VERSION=1.19.4 >> $GITHUB_ENV
+          echo LXD_VERSION=5.9 >> $GITHUB_ENV
+          echo PATH="/usr/local/go/bin:$PATH" >> $GITHUB_ENV
+
+      - name: install dependencies
+        run: |
+          curl -OL https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
+          sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
+
+          sudo apt update
+          sudo apt install --yes \
+            acl \
+            attr \
+            autoconf \
+            automake \
+            dnsmasq-base \
+            git \
+            libacl1-dev \
+            libcap-dev \
+            liblxc1 \
+            liblxc-dev \
+            libsqlite3-dev \
+            libtool \
+            libudev-dev \
+            liblz4-dev \
+            libuv1-dev \
+            make \
+            pkg-config \
+            rsync \
+            squashfs-tools \
+            tar \
+            tcl \
+            xz-utils \
+            ebtables \
+            devscripts \
+            debhelper
+
+      - name: build lxd
+        run: |
+          curl -OL https://github.com/lxc/lxd/releases/download/lxd-${LXD_VERSION}/lxd-${LXD_VERSION}.tar.gz
+          tar xf lxd-${LXD_VERSION}.tar.gz
+
+          # build upstream release
+          cd lxd-${LXD_VERSION}
+
+          go mod tidy
+          make deps
+
+          export CGO_CFLAGS="-I$(pwd)/vendor/raft/include/ -I$(pwd)/vendor/dqlite/include/"
+          export CGO_LDFLAGS="-L$(pwd)/vendor/raft/.libs -L$(pwd)/vendor/dqlite/.libs/"
+          export LD_LIBRARY_PATH="$(pwd)/vendor/raft/.libs/:$(pwd)/vendor/dqlite/.libs/"
+          export CGO_LDFLAGS_ALLOW="(-Wl,-wrap,pthread_create)|(-Wl,-z,now)"
+          make
+
+      - name: debianize lxd
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          OS: ${{ matrix.os }}
+        run: |
+          cd lxd-${LXD_VERSION}
+          mkdir -p ../pkgdata/lxd/usr/bin/
+          mkdir -p ../pkgdata/lxd/usr/lib/
+
+          cp $(go env GOPATH)/bin/lxd ../pkgdata/lxd/usr/bin/
+          cp $(go env GOPATH)/bin/lxd-user ../pkgdata/lxd/usr/bin/
+          cp $(go env GOPATH)/bin/lxc ../pkgdata/lxd/usr/bin/
+
+          cp --preserve=links $(pwd)/vendor/dqlite/.libs/*.so ../pkgdata/lxd/usr/lib/
+          cp --preserve=links $(pwd)/vendor/raft/.libs/*.so ../pkgdata/lxd/usr/lib/
+
+          cd ..
+          rm -r lxd-${LXD_VERSION}
+
+          source /etc/lsb-release
+
+          sed -i "s/__VERSION__/${LXD_VERSION}/g" debian/changelog
+          sed -i "s/__DIST__/${DISTRIB_CODENAME}/g" debian/changelog
+
+          SOURCE_VERSION=$(dpkg-parsechangelog --show-field Version | cut -d: -f2)
+
+          echo -n "$SIGNING_KEY" | base64 --decode | gpg --import
+          echo "FB192EEBA97E216FBC5CA6E8AE8977855A7038D6:6:" > ownertrust
+          gpg --import-ownertrust ownertrust
+
+          debuild --no-tgz-check -S -kFB192EEBA97E216FBC5CA6E8AE8977855A7038D6
+
+          cp ../lxd_${SOURCE_VERSION}_source.build .
+          cp ../lxd_${SOURCE_VERSION}_source.buildinfo .
+          cp ../lxd_${SOURCE_VERSION}_source.changes .
+          cp ../lxd_${SOURCE_VERSION}.tar.xz ../lxd_${SOURCE_VERSION}.orig.tar.xz
+          cp ../lxd_${SOURCE_VERSION}.tar.xz lxd_${SOURCE_VERSION}.tar.xz
+          cp ../lxd_${SOURCE_VERSION}.orig.tar.xz lxd_${SOURCE_VERSION}.orig.tar.xz
+          cp ../lxd_${SOURCE_VERSION}.dsc .
+
+      - name: publish package to ppa
+        #if: github.ref == 'refs/heads/master'
+        run: |
+          echo "[lxd-ppa]" >> ~/.dput.cf
+          echo "fqdn = ppa.launchpad.net" >> ~/.dput.cf
+          echo "method = ftp" >> ~/.dput.cf
+          echo "incoming = ~randombenj/ubuntu/lxd/" >> ~/.dput.cf
+          echo "login = anonymous" >> ~/.dput.cf
+          echo "allow_unsigned_uploads = 0" >> ~/.dput.cf
+
+          dput ppa:randombenj/lxd lxd_*.changes
