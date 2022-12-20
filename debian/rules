@@ -7,3 +7,7 @@ export DEB_BUILD_OPTIONS=nostrip
 
 # linker check fails ...
 override_dh_shlibdeps:
+override_dh_auto_clean:
+override_dh_auto_build:
+override_dh_auto_test:
+override_dh_auto_install:

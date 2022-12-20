@@ -1,6 +1,6 @@
-lxd-*/
-pkgdata/lxd/usr/lib/*
-pkgdata/lxd/usr/bin/*
+/lxd-*/
+/pkgdata/*/usr/lib/x86_64-linux-gnu/*
+/pkgdata/*/usr/bin/*
 
 /debian/files
 /debian/*.substvars
@@ -10,4 +10,3 @@ pkgdata/lxd/usr/bin/*
 /debian/*.debhelper
 /debian/*-stamp
 /debian/*/
-

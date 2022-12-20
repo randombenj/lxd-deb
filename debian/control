@@ -1,8 +1,7 @@
 Source: lxd
-Maintainer: Debian Go Packaging Team <team+pkg-go@tracker.debian.org>
-Uploaders: Mathias Gibbens <mathias@calenhad.com>
+Maintainer: Benj Fassbind <randombenj@gmail.com>
+Uploaders: Benj Fassbind <randombenj@gmail.com>
 Section: admin
-Testsuite: autopkgtest-pkg-go
 Priority: optional
 Build-Depends: debhelper
 Standards-Version: 4.6.1
@@ -22,11 +21,13 @@ Depends: ${misc:Depends},
          dnsmasq,
          liblxc-common,
          lxcfs,
+         lxd-client (= ${binary:Version}),
          rsync,
          squashfs-tools,
          uidmap,
          libuv1,
          iptables,
+         qemu-system-x86,
          xz-utils
 Recommends: apparmor
 # First line of suggested packages will enable additional LXD storage backends
@@ -43,3 +44,69 @@ Description: Powerful system container and virtual machine manager - daemon
  simple, REST API.
  .
  This package contains the LXD daemon.
+
+Package: lxd-client
+# The lxc binary doesn't depend on liblxc1, so it can be built for any architecture
+Architecture: any
+Replaces: lxd-installer
+Breaks: lxd-installer
+Depends: ${misc:Depends},
+         ${shlibs:Depends}
+Built-Using: ${misc:Built-Using}
+Description: Powerful system container and virtual machine manager - client
+ LXD is a next generation system container and virtual machine manager.
+ It offers a unified user experience around full Linux systems running
+ inside containers or virtual machines.
+ .
+ A REST API is offered by LXD to remotely manage containers over the network,
+ using an image based work-flow and with support for live migration.
+ .
+ This package contains the LXD command line client.
+
+Package: lxd-agent
+Architecture: linux-any
+Depends: ${misc:Depends}
+Built-Using: ${misc:Built-Using}
+Description: LXD guest agent
+ This package provides an agent to run inside LXD virtual machine guests.
+ .
+ It has to be installed on the LXD host if you want to allow agent
+ injection capability when creating a virtual machine.
+
+
+Package: libdqlite0
+Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
+Depends: libc6,
+         libraft2,
+         libsqlite3-0,
+         libuv1,
+         libgcc-s1
+Description: userspace RCU (read-copy-update) library
+ This data synchronization library provides read-side access which scales
+ linearly with the number of cores. It does so by allowing multiples copies of
+ a given data structure to live at the same time, and by monitoring the data
+ structure accesses to detect grace periods after which memory reclamation is
+ possible.
+
+Package: libraft2
+Section: libs
+Architecture: any
+Multi-Arch: same
+Pre-Depends: ${misc:Pre-Depends}
+Depends: libc6,
+         libuv1,
+         libgcc-s1
+Description: Raft Consensus protocol implementation - shared library
+ Fully asynchronous C implementation of the Raft consensus protocol.
+ .
+ The library has modular design: its core part implements only the core Raft
+ algorithm logic, in a fully platform independent way. On top of that, a
+ pluggable interface defines the I/O implementation for networking
+ (send/receive RPC messages) and disk persistence (store log entries and
+ snapshots).
+ .
+ This package contains the C library needed to run executables that use Raft
+ Consensus protocol.
+
