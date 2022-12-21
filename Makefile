@@ -62,8 +62,8 @@ pkg:
 	mkdir -p pkgdata/lxd/usr/bin/
 	mkdir -p pkgdata/lxd-client/usr/bin/
 	mkdir -p pkgdata/lxd-agent/usr/bin/
-	mkdir -p pkgdata/libdqlite0/usr/lib/x86_64-linux-gnu
-	mkdir -p pkgdata/libraft2/usr/lib/x86_64-linux-gnu
+	mkdir -p pkgdata/libdqlite0/usr/lib/x86_64-linux-gnu/
+	mkdir -p pkgdata/libraft2/usr/lib/x86_64-linux-gnu/
 
 
 	cp $(shell go env GOPATH)/bin/lxd pkgdata/lxd/usr/bin/
@@ -73,8 +73,8 @@ pkg:
 
 	cp $(shell go env GOPATH)/bin/lxc pkgdata/lxd-client/usr/bin/
 
-	cp --preserve=links $(PWD)/lxd-$(LXD_VERSION)/vendor/dqlite/.libs/*.so pkgdata/libdqlite0/usr/lib/x86_64-linux-gnu
-	cp --preserve=links $(PWD)/lxd-$(LXD_VERSION)/vendor/raft/.libs/*.so pkgdata/libraft2/usr/lib/x86_64-linux-gnu
+	cp -P $(PWD)/lxd-$(LXD_VERSION)/vendor/dqlite/.libs/*.so* pkgdata/libdqlite0/usr/lib/x86_64-linux-gnu/
+	cp -P $(PWD)/lxd-$(LXD_VERSION)/vendor/raft/.libs/*.so* pkgdata/libraft2/usr/lib/x86_64-linux-gnu/
 
 	@echo "Done building, you can now run:"
 	@echo "  debuild --no-tgz-check"
