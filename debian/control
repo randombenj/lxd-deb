@@ -23,6 +23,7 @@ Depends: ${misc:Depends},
          libdqlite0,
          lxcfs,
          lxd-client (= ${binary:Version}),
+         lxd-agent (= ${binary:Version}),
          rsync,
          squashfs-tools,
          uidmap,
@@ -32,8 +33,7 @@ Depends: ${misc:Depends},
          xz-utils
 Recommends: apparmor
 # First line of suggested packages will enable additional LXD storage backends
-Suggests: btrfs-progs, ceph-common, lvm2, zfsutils-linux,
-          lxd-agent, lxd-tools, gdisk, tomoyo-tools
+Suggests: btrfs-progs, ceph-common, lvm2, zfsutils-linux, lxd-tools, gdisk, tomoyo-tools
 Built-Using: ${misc:Built-Using}
 Description: Powerful system container and virtual machine manager - daemon
  LXD is a next generation system container and virtual machine manager.
