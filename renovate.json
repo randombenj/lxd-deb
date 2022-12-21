@@ -1,0 +1,17 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base"
+  ],
+  "regexManagers": [
+      {
+        "fileMatch": ["^.github/workflows/debianize.yml$"],
+        "matchStrings": ["echo LXD_VERSION=(?<currentValue>.*?) >> $GITHUB_ENV"],
+        "depNameTemplate": "lxc/lxd",
+        "datasourceTemplate": "github-releases",
+        "versioningTemplate": "loose"
+      }
+  ],
+  "prHourlyLimit": 10
+}
+
