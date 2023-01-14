@@ -1,6 +1,6 @@
 name: debianize lxd
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   debianize-lxd:
@@ -49,10 +49,17 @@ jobs:
           echo "FB192EEBA97E216FBC5CA6E8AE8977855A7038D6:6:" > ownertrust
           gpg --import-ownertrust ownertrust
 
-          debuild --no-tgz-check -S -kFB192EEBA97E216FBC5CA6E8AE8977855A7038D6
+          debuild --no-tgz-check -kFB192EEBA97E216FBC5CA6E8AE8977855A7038D6
 
           cp ../lxd_${SOURCE_VERSION}.tar.xz ../lxd_${SOURCE_VERSION}.orig.tar.xz
 
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: lxd build
+          path: |
+            ../*.deb
+            ../lxd_${SOURCE_VERSION}.tar.xz
 
       - name: publish package to ppa
         if: github.ref == 'refs/heads/master'
