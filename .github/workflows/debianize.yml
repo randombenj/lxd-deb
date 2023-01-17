@@ -29,6 +29,11 @@ jobs:
         run: |
           make build
 
+      - name: run lxd tests
+        run: |
+          sudo apt update && sudo apt install --yes socat
+          cd lxd-${LXD_VERSION}/test/ && sudo ./main.sh standalone
+
       - name: debianize lxd
         env:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
@@ -52,14 +57,16 @@ jobs:
           debuild --no-tgz-check -kFB192EEBA97E216FBC5CA6E8AE8977855A7038D6
 
           cp ../lxd_${SOURCE_VERSION}.tar.xz ../lxd_${SOURCE_VERSION}.orig.tar.xz
+          cp ../*.deb .
+          cp ../lxd_${SOURCE_VERSION}.tar.xz .
 
       - name: Archive build artifacts
         uses: actions/upload-artifact@v3
         with:
           name: lxd build
           path: |
-            ../*.deb
-            ../lxd_${SOURCE_VERSION}.tar.xz
+            *.deb
+            lxd_${SOURCE_VERSION}.tar.xz
 
       - name: publish package to ppa
         if: github.ref == 'refs/heads/master'
