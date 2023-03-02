@@ -1,6 +1,6 @@
 name: debianize lxd
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   debianize-lxd:
@@ -15,7 +15,7 @@ jobs:
       - name: setup env
         run: |
           echo GO_VERSION=1.19.4 >> $GITHUB_ENV
-          echo LXD_VERSION=5.9 >> $GITHUB_ENV
+          echo LXD_VERSION=5.10 >> $GITHUB_ENV
           echo PATH="/usr/local/go/bin:$PATH" >> $GITHUB_ENV
 
       - name: install dependencies
@@ -28,6 +28,11 @@ jobs:
       - name: build lxd
         run: |
           make build
+
+      # - name: run lxd tests
+      #   run: |
+      #     sudo apt update && sudo apt install --yes socat
+      #     cd lxd-${LXD_VERSION}/ && sudo -E make check
 
       - name: debianize lxd
         env:
@@ -49,13 +54,22 @@ jobs:
           echo "FB192EEBA97E216FBC5CA6E8AE8977855A7038D6:6:" > ownertrust
           gpg --import-ownertrust ownertrust
 
-          debuild --no-tgz-check -S -kFB192EEBA97E216FBC5CA6E8AE8977855A7038D6
+          debuild --no-tgz-check -kFB192EEBA97E216FBC5CA6E8AE8977855A7038D6
 
           cp ../lxd_${SOURCE_VERSION}.tar.xz ../lxd_${SOURCE_VERSION}.orig.tar.xz
+          cp ../*.deb .
+          cp ../lxd_${SOURCE_VERSION}.tar.xz .
 
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: lxd build
+          path: |
+            *.deb
+            lxd_${SOURCE_VERSION}.tar.xz
 
       - name: publish package to ppa
-        #if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master'
         run: |
           echo "[lxd-ppa]" >> ~/.dput.cf
           echo "fqdn = ppa.launchpad.net" >> ~/.dput.cf
