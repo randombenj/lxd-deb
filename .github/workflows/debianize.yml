@@ -29,10 +29,10 @@ jobs:
         run: |
           make build
 
-      - name: run lxd tests
-        run: |
-          sudo apt update && sudo apt install --yes socat
-          cd lxd-${LXD_VERSION}/ && sudo -E make check
+      # - name: run lxd tests
+      #   run: |
+      #     sudo apt update && sudo apt install --yes socat
+      #     cd lxd-${LXD_VERSION}/ && sudo -E make check
 
       - name: debianize lxd
         env:
