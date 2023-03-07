@@ -15,7 +15,7 @@ jobs:
       - name: setup env
         run: |
           echo GO_VERSION=1.19.4 >> $GITHUB_ENV
-          echo LXD_VERSION=5.10 >> $GITHUB_ENV
+          echo LXD_VERSION=5.11 >> $GITHUB_ENV
           echo PATH="/usr/local/go/bin:$PATH" >> $GITHUB_ENV
 
       - name: install dependencies
@@ -24,10 +24,12 @@ jobs:
           sudo apt install --yes devscripts debhelper
 
           curl -OL https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
-          sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
+          sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz &&
+            rm go${GO_VERSION}.linux-amd64.tar.gz
 
           curl --fail -SOL https://github.com/lxc/lxd/releases/download/lxd-${LXD_VERSION}/lxd-${LXD_VERSION}.tar.gz
-          tar xf lxd-${LXD_VERSION}.tar.gz
+          tar xf lxd-${LXD_VERSION}.tar.gz &&
+            rm lxd-${LXD_VERSION}.tar.gz
           cd lxd-${LXD_VERSION} && \
             patch -p1  < ../disable-qemu-set-action.patch
 
