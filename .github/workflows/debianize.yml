@@ -20,53 +20,63 @@ jobs:
 
       - name: install dependencies
         run: |
+          sudo apt update
+          sudo apt install --yes devscripts debhelper
+
           curl -OL https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
           sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
 
-          make prepare
-
-      - name: build lxd
-        run: |
-          make build
-
-      # - name: run lxd tests
-      #   run: |
-      #     sudo apt update && sudo apt install --yes socat
-      #     cd lxd-${LXD_VERSION}/ && sudo -E make check
+          curl --fail -SOL https://github.com/lxc/lxd/releases/download/lxd-${LXD_VERSION}/lxd-${LXD_VERSION}.tar.gz
+          tar xf lxd-${LXD_VERSION}.tar.gz
+          cd lxd-${LXD_VERSION} && \
+            patch -p1  < ../disable-qemu-set-action.patch
 
       - name: debianize lxd
         env:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
           OS: ${{ matrix.os }}
         run: |
-          make pkg
-
           source /etc/lsb-release
 
           sed -i "s/__VERSION__/${LXD_VERSION}/g" debian/changelog
+          sed -i "s/__VERSION__/${LXD_VERSION}/g" debian/rules
           sed -i "s/__DIST__/${DISTRIB_CODENAME}/g" debian/changelog
 
-          rm -r lxd-${LXD_VERSION}
+          cd lxd-${LXD_VERSION} &&
+            go mod vendor &&
+            cd -
+
+          git clone --depth=1 "https://github.com/canonical/raft" lxd-${LXD_VERSION}/vendor/raft
+          git clone --depth=1 "https://github.com/canonical/dqlite" lxd-${LXD_VERSION}/vendor/dqlite/
 
           SOURCE_VERSION=$(dpkg-parsechangelog --show-field Version | cut -d: -f2)
+          echo SOURCE_VERSION=${SOURCE_VERSION} >> $GITHUB_ENV
 
           echo -n "$SIGNING_KEY" | base64 --decode | gpg --import
           echo "FB192EEBA97E216FBC5CA6E8AE8977855A7038D6:6:" > ownertrust
           gpg --import-ownertrust ownertrust
 
-          debuild --no-tgz-check -kFB192EEBA97E216FBC5CA6E8AE8977855A7038D6
+          debuild -d --no-tgz-check -kFB192EEBA97E216FBC5CA6E8AE8977855A7038D6 -S
 
           cp ../lxd_${SOURCE_VERSION}.tar.xz ../lxd_${SOURCE_VERSION}.orig.tar.xz
-          cp ../*.deb .
           cp ../lxd_${SOURCE_VERSION}.tar.xz .
+
+      - name: test debuild
+        run: |
+          mkdir _test_debuild
+          cp lxd_${SOURCE_VERSION}.tar.xz _test_debuild
+          tar xf lxd_${SOURCE_VERSION}.tar.xz -C _test_debuild
+          cd _test_debuild/lxd-deb/ &&
+            sudo apt build-dep . &&
+            debuild -us -uc -b
 
       - name: Archive build artifacts
         uses: actions/upload-artifact@v3
         with:
           name: lxd build
           path: |
-            *.deb
-            lxd_${SOURCE_VERSION}.tar.xz
+            lxd_*.tar.xz
+            _test_debuild/*.deb
 
       - name: publish package to ppa
         if: github.ref == 'refs/heads/master'

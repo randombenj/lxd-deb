@@ -1,6 +1,7 @@
 #!/usr/bin/make -f
 
-export DEB_BUILD_OPTIONS=nostrip
+export DEB_BUILD_OPTIONS = nostrip
+export LXD_VERSION = 5.10
 
 %:
 	dh $@
@@ -9,5 +10,38 @@ export DEB_BUILD_OPTIONS=nostrip
 override_dh_shlibdeps:
 override_dh_auto_clean:
 override_dh_auto_build:
+
+	sed -i 's|\bgo\b|/usr/lib/go-1.18/bin/go|g' lxd-$(LXD_VERSION)/Makefile
+	sed -i 's|\bgofmt\b|/usr/lib/go-1.18/bin/gofmt|g' lxd-$(LXD_VERSION)/Makefile
+	sed -i 's|\bgoimports\b|/usr/lib/go-1.18/bin/goimports|g' lxd-$(LXD_VERSION)/Makefile
+
+	export GOCACHE=$(CURDIR)/.cache && \
+	export GOPATH=$(CURDIR)/.go && \
+	$(MAKE) -C lxd-$(LXD_VERSION) deps
+
+	export CGO_CFLAGS="-I$(CURDIR)/lxd-$(LXD_VERSION)/vendor/raft/include/ -I$(CURDIR)/lxd-$(LXD_VERSION)/vendor/dqlite/include/" && \
+	export CGO_LDFLAGS="-L$(CURDIR)/lxd-$(LXD_VERSION)/vendor/raft/.libs -L$(CURDIR)/lxd-$(LXD_VERSION)/vendor/dqlite/.libs/" && \
+	export LD_LIBRARY_PATH="$(CURDIR)/lxd-$(LXD_VERSION)/vendor/raft/.libs/:$(CURDIR)/lxd-$(LXD_VERSION)/vendor/dqlite/.libs/" && \
+	export CGO_LDFLAGS_ALLOW="(-Wl,-wrap,pthread_create)|(-Wl,-z,now)" && \
+	export GOCACHE=$(CURDIR)/.cache && \
+	export GOPATH=$(CURDIR)/.go && \
+	$(MAKE) -C lxd-$(LXD_VERSION)
+
+	mkdir -p pkgdata/lxd/usr/bin/
+	mkdir -p pkgdata/lxd-client/usr/bin/
+	mkdir -p pkgdata/lxd-agent/usr/bin/
+	mkdir -p pkgdata/libdqlite0/usr/lib/x86_64-linux-gnu/
+	mkdir -p pkgdata/libraft2/usr/lib/x86_64-linux-gnu/
+
+	cp $(CURDIR)/.go/bin/lxd pkgdata/lxd/usr/bin/
+	cp $(CURDIR)/.go/bin/lxd-user pkgdata/lxd/usr/bin/
+
+	cp $(CURDIR)/.go/bin/lxd-agent pkgdata/lxd-agent/usr/bin/
+
+	cp $(CURDIR)/.go/bin/lxc pkgdata/lxd-client/usr/bin/
+
+	cp -P $(CURDIR)/lxd-$(LXD_VERSION)/vendor/dqlite/.libs/*.so* pkgdata/libdqlite0/usr/lib/x86_64-linux-gnu/
+	cp -P $(CURDIR)/lxd-$(LXD_VERSION)/vendor/raft/.libs/*.so* pkgdata/libraft2/usr/lib/x86_64-linux-gnu/
+
 override_dh_auto_test:
 override_dh_auto_install:

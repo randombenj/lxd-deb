@@ -10,3 +10,4 @@
 /debian/*.debhelper
 /debian/*-stamp
 /debian/*/
+!/debian/source/options
