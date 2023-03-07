@@ -15,7 +15,7 @@ jobs:
       - name: setup env
         run: |
           echo GO_VERSION=1.19.4 >> $GITHUB_ENV
-          echo LXD_VERSION=5.10 >> $GITHUB_ENV
+          echo LXD_VERSION=5.11 >> $GITHUB_ENV
           echo PATH="/usr/local/go/bin:$PATH" >> $GITHUB_ENV
 
       - name: install dependencies
