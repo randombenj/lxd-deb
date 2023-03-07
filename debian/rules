@@ -15,6 +15,8 @@ override_dh_auto_build:
 	sed -i 's|\bgofmt\b|/usr/lib/go-1.18/bin/gofmt|g' lxd-$(LXD_VERSION)/Makefile
 	sed -i 's|\bgoimports\b|/usr/lib/go-1.18/bin/goimports|g' lxd-$(LXD_VERSION)/Makefile
 
+	export GOCACHE=$(CURDIR)/.cache && \
+	export GOPATH=$(CURDIR)/.go && \
 	$(MAKE) -C lxd-$(LXD_VERSION) deps
 
 	export CGO_CFLAGS="-I$(CURDIR)/lxd-$(LXD_VERSION)/vendor/raft/include/ -I$(CURDIR)/lxd-$(LXD_VERSION)/vendor/dqlite/include/" && \
