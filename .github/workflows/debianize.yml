@@ -67,6 +67,7 @@ jobs:
           cp lxd_${SOURCE_VERSION}.tar.xz _test_debuild
           tar xf lxd_${SOURCE_VERSION}.tar.xz -C _test_debuild
           cd _test_debuild/lxd-deb/ &&
+            sudo apt build-dep . &&
             debuild -us -uc -b
 
       - name: Archive build artifacts
