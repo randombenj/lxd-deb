@@ -4,6 +4,8 @@ export DEB_BUILD_OPTIONS = nostrip
 export LXD_VERSION = __VERSION__
 export GOPATH = $(PWD)/go
 
+
+
 %:
 	dh $@
 
@@ -22,6 +24,7 @@ override_dh_auto_build:
 	export CGO_LDFLAGS="-L$(CURDIR)/lxd-$(LXD_VERSION)/vendor/raft/.libs -L$(CURDIR)/lxd-$(LXD_VERSION)/vendor/dqlite/.libs/" && \
 	export LD_LIBRARY_PATH="$(CURDIR)/lxd-$(LXD_VERSION)/vendor/raft/.libs/:$(CURDIR)/lxd-$(LXD_VERSION)/vendor/dqlite/.libs/" && \
 	export CGO_LDFLAGS_ALLOW="(-Wl,-wrap,pthread_create)|(-Wl,-z,now)" && \
+	export GOCACHE=$(CURDIR)/.cache && \
 	$(MAKE) -C lxd-$(LXD_VERSION)
 
 	mkdir -p pkgdata/lxd/usr/bin/
