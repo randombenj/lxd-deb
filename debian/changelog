@@ -1,4 +1,4 @@
-lxd (2:__VERSION__-5) __DIST__; urgency=medium
+lxd (2:__VERSION__-6) __DIST__; urgency=medium
 
   * Package LXD __VERSION__
 

@@ -18,9 +18,9 @@ override_dh_auto_build:
 
 	$(MAKE) -C lxd-$(LXD_VERSION) deps
 
-	export CGO_CFLAGS="-I$(PWD)/lxd-$(LXD_VERSION)/vendor/raft/include/ -I$(PWD)/lxd-$(LXD_VERSION)/vendor/dqlite/include/" && \
-	export CGO_LDFLAGS="-L$(PWD)/lxd-$(LXD_VERSION)/vendor/raft/.libs -L$(PWD)/lxd-$(LXD_VERSION)/vendor/dqlite/.libs/" && \
-	export LD_LIBRARY_PATH="$(PWD)/lxd-$(LXD_VERSION)/vendor/raft/.libs/:$(PWD)/lxd-$(LXD_VERSION)/vendor/dqlite/.libs/" && \
+	export CGO_CFLAGS="-I$(CURDIR)/lxd-$(LXD_VERSION)/vendor/raft/include/ -I$(CURDIR)/lxd-$(LXD_VERSION)/vendor/dqlite/include/" && \
+	export CGO_LDFLAGS="-L$(CURDIR)/lxd-$(LXD_VERSION)/vendor/raft/.libs -L$(CURDIR)/lxd-$(LXD_VERSION)/vendor/dqlite/.libs/" && \
+	export LD_LIBRARY_PATH="$(CURDIR)/lxd-$(LXD_VERSION)/vendor/raft/.libs/:$(CURDIR)/lxd-$(LXD_VERSION)/vendor/dqlite/.libs/" && \
 	export CGO_LDFLAGS_ALLOW="(-Wl,-wrap,pthread_create)|(-Wl,-z,now)" && \
 	$(MAKE) -C lxd-$(LXD_VERSION)
 
@@ -29,7 +29,6 @@ override_dh_auto_build:
 	mkdir -p pkgdata/lxd-agent/usr/bin/
 	mkdir -p pkgdata/libdqlite0/usr/lib/x86_64-linux-gnu/
 	mkdir -p pkgdata/libraft2/usr/lib/x86_64-linux-gnu/
-
 
 	cp $(shell go env GOPATH)/bin/lxd pkgdata/lxd/usr/bin/
 	cp $(shell go env GOPATH)/bin/lxd-user pkgdata/lxd/usr/bin/
