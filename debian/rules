@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 export DEB_BUILD_OPTIONS = nostrip
-export LXD_VERSION = 5.10
+export LXD_VERSION = __VERSION__
 
 %:
 	dh $@
