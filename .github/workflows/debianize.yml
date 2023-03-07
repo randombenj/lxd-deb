@@ -50,6 +50,7 @@ jobs:
           git clone --depth=1 "https://github.com/canonical/dqlite" lxd-${LXD_VERSION}/vendor/dqlite/
 
           SOURCE_VERSION=$(dpkg-parsechangelog --show-field Version | cut -d: -f2)
+          echo SOURCE_VERSION=${SOURCE_VERSION} >> $GITHUB_ENV
 
           echo -n "$SIGNING_KEY" | base64 --decode | gpg --import
           echo "FB192EEBA97E216FBC5CA6E8AE8977855A7038D6:6:" > ownertrust
@@ -60,15 +61,24 @@ jobs:
           cp ../lxd_${SOURCE_VERSION}.tar.xz ../lxd_${SOURCE_VERSION}.orig.tar.xz
           cp ../lxd_${SOURCE_VERSION}.tar.xz .
 
+      - name: test debuild
+        run: |
+          mkdir _test_debuild
+          cp lxd_${SOURCE_VERSION}.tar.xz _test_debuild
+          tar xf lxd_${SOURCE_VERSION}.tar.xz -C _test_debuild
+          cd _test_debuild/lxd-deb/ &&
+            debuild -us -uc -b
+
       - name: Archive build artifacts
         uses: actions/upload-artifact@v3
         with:
           name: lxd build
           path: |
             lxd_*.tar.xz
+            _test_debuild/*.deb
 
       - name: publish package to ppa
-        #if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master'
         run: |
           echo "[lxd-ppa]" >> ~/.dput.cf
           echo "fqdn = ppa.launchpad.net" >> ~/.dput.cf
