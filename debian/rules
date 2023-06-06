@@ -29,6 +29,7 @@ override_dh_auto_build:
 
 	mkdir -p pkgdata/lxd/usr/bin/
 	mkdir -p pkgdata/lxd-client/usr/bin/
+	mkdir -p pkgdata/lxd-client/usr/share/bash-completion/completions/
 	mkdir -p pkgdata/lxd-agent/usr/bin/
 	mkdir -p pkgdata/libdqlite0/usr/lib/x86_64-linux-gnu/
 	mkdir -p pkgdata/libraft2/usr/lib/x86_64-linux-gnu/
@@ -39,6 +40,7 @@ override_dh_auto_build:
 	cp $(CURDIR)/.go/bin/lxd-agent pkgdata/lxd-agent/usr/bin/
 
 	cp $(CURDIR)/.go/bin/lxc pkgdata/lxd-client/usr/bin/
+	cp $(CURDIR)/lxd-$(LXD_VERSION)/scripts/bash/lxd-client pkgdata/lxd-client/usr/share/bash-completion/completions/lxc
 
 	cp -P $(CURDIR)/lxd-$(LXD_VERSION)/vendor/dqlite/.libs/*.so* pkgdata/libdqlite0/usr/lib/x86_64-linux-gnu/
 	cp -P $(CURDIR)/lxd-$(LXD_VERSION)/vendor/raft/.libs/*.so* pkgdata/libraft2/usr/lib/x86_64-linux-gnu/
