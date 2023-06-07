@@ -76,8 +76,8 @@ Description: Powerful system container and virtual machine manager - daemon
 Package: lxd-client
 # The lxc binary doesn't depend on liblxc1, so it can be built for any architecture
 Architecture: any
-Replaces: lxd-installer
-Breaks: lxd-installer
+Replaces: lxd-installer, lxc-utils
+Breaks: lxd-installer, lxc-utils
 Depends: ${misc:Depends},
          ${shlibs:Depends}
 Built-Using: ${misc:Built-Using}
@@ -93,6 +93,8 @@ Description: Powerful system container and virtual machine manager - client
 
 Package: lxd-agent
 Architecture: linux-any
+Replaces: lxd-agent-loader
+Breaks: lxd-agent-loader
 Depends: ${misc:Depends}
 Built-Using: ${misc:Built-Using}
 Description: LXD guest agent
