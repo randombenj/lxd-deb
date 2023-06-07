@@ -93,6 +93,8 @@ Description: Powerful system container and virtual machine manager - client
 
 Package: lxd-agent
 Architecture: linux-any
+Replaces: lxd-agent-loader
+Breaks: lxd-agent-loader
 Depends: ${misc:Depends}
 Built-Using: ${misc:Built-Using}
 Description: LXD guest agent
