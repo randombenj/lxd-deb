@@ -1,3 +1,5 @@
+> :warning:&nbsp;&nbsp;**THIS REPO IS NO LONGER MAINTAINED**
+
 # LXD Debian Package
 
 > 🛈 &nbsp; https://launchpad.net/~randombenj/+archive/ubuntu/lxd
